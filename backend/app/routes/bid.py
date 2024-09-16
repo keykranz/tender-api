@@ -250,7 +250,7 @@ def update_bid_status(
         bid = get_bid_by_id(bid_id, db)
         check_user_responsibility(user.id, bid.organization_id, db)
 
-        if new_status not in ["CREATED", "PUBLISHED", "CANCELED", "APPROVED", "REJECTED"]:
+        if new_status not in ["PUBLISHED", "CANCELED"]:
             raise HTTPException(status_code=400, detail="Invalid status")
 
         bid.status = new_status
