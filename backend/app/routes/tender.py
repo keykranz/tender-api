@@ -100,8 +100,8 @@ def get_tenders(
 
         tenders_query = (
             db.query(Tender)
-            .join(subquery, (Tender.tender_root_id == subquery.c.tender_root_id) &
-                  (Tender.version == subquery.c.max_version))
+            .join(subquery,
+                  (Tender.tender_root_id == subquery.c.tender_root_id) & (Tender.version == subquery.c.max_version))
         )
 
         if service_type:
@@ -116,8 +116,7 @@ def get_tenders(
                 raise HTTPException(status_code=404, detail="User not found")
 
             tenders_query = tenders_query.filter(
-                (Tender.status == "PUBLISHED") |
-                (
+                (Tender.status == "PUBLISHED") | (
                     db.query(OrganizationResponsible)
                     .filter(
                         OrganizationResponsible.user_id == user.id,
@@ -152,8 +151,8 @@ def get_user_tenders(
         tenders = (
             db.query(Tender)
             .join(OrganizationResponsible, OrganizationResponsible.organization_id == Tender.organization_id)
-            .join(subquery, (Tender.tender_root_id == subquery.c.tender_root_id) &
-                  (Tender.version == subquery.c.max_version))
+            .join(subquery,
+                  (Tender.tender_root_id == subquery.c.tender_root_id) & (Tender.version == subquery.c.max_version))
             .filter(OrganizationResponsible.user_id == user.id)
             .all()
         )

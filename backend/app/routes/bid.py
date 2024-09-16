@@ -95,8 +95,7 @@ def get_bids(
         ).subquery()
 
         bids_query = bids_query.filter(
-            (Bid.organization_id.in_(responsible_orgs)) |
-            and_(
+            (Bid.organization_id.in_(responsible_orgs)) | and_(
                 Bid.status == "PUBLISHED",
                 db.query(Tender.organization_id)
                 .filter(Tender.id == Bid.tender_id, Tender.organization_id.in_(responsible_orgs))
@@ -129,8 +128,7 @@ def get_user_bids(
         # Основной запрос для получения последних версий предложений пользователя
         bids = (
             db.query(Bid)
-            .join(subquery, (Bid.bid_root_id == subquery.c.bid_root_id)
-                  & (Bid.version == subquery.c.max_version))
+            .join(subquery, (Bid.bid_root_id == subquery.c.bid_root_id) & (Bid.version == subquery.c.max_version))
             .filter(Bid.creator_id == user.id)
             .all()
         )
@@ -167,7 +165,9 @@ def create_bid(
         if not organization:
             raise HTTPException(status_code=404, detail="Organization not found")
 
-        tender = get_tender_by_id(bid.tender_id, db)
+        tender = db.query(Tender).filter(Tender.id == bid.tender_id).first()
+        if not tender:
+            raise HTTPException(status_code=404, detail="Tender not found")
 
         if not bid.title or not bid.description or not bid.amount:
             raise HTTPException(status_code=400, detail="Title, description, and amount are required")
